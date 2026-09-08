@@ -1,0 +1,60 @@
+#
+# Copyright (C) 2015-2016 OpenWrt.org
+# Copyright (C) 2026 jjm2473@gmail.com
+#
+# This is free software, licensed under the GNU General Public License v3.
+#
+
+include $(TOPDIR)/rules.mk
+
+PKG_ARCH_BAIDUDRIVE:=$(ARCH)
+
+PKG_NAME:=baidudrive
+PKG_VERSION:=1.0.3
+PKG_RELEASE:=
+PKG_SOURCE:=$(PKG_NAME)-binary-$(PKG_VERSION).tar.gz
+PKG_SOURCE_URL:=https://github.com/linkease/istore-packages/releases/download/baidudrive/
+PKG_HASH:=a1e5a19204f3f7de71ad546db679a7af84e5b7181e5ff135dd6be2b84bf973f9
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-binary-$(PKG_VERSION)
+
+PKG_BUILD_PARALLEL:=1
+PKG_USE_MIPS16:=0
+STRIP:=true
+RSTRIP:=:
+
+include $(INCLUDE_DIR)/package.mk
+
+define Package/$(PKG_NAME)
+	SECTION:=net
+	CATEGORY:=Network
+	SUBMENU:=Web Servers/Proxies
+	TITLE:=BaiduDrive
+	DEPENDS:=@(x86_64||aarch64) +curl +baidusdk
+	URL:=https://github.com/linkease/istore-packages
+endef
+
+define Package/$(PKG_NAME)/description
+  BaiduDrive provides a Baidu Netdisk Web UI for iStoreOS.
+endef
+
+define Package/$(PKG_NAME)/conffiles
+/etc/config/baidudrive
+endef
+
+define Build/Configure
+endef
+
+define Build/Compile
+endef
+
+define Package/$(PKG_NAME)/install
+	$(INSTALL_DIR) $(1)/usr/sbin $(1)/usr/libexec/baidudrive $(1)/usr/lib/baidusdk/nas_sdk $(1)/etc/init.d $(1)/etc/uci-defaults $(1)/etc/config
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/baidudrive.$(PKG_ARCH_BAIDUDRIVE) $(1)/usr/sbin/baidudrive
+	$(LN) /usr/sbin/baidudrive $(1)/usr/lib/baidusdk/nas_sdk/P2PClient
+	$(INSTALL_BIN) ./files/sdk-init.sh $(1)/usr/libexec/baidudrive/sdk-init.sh
+	$(INSTALL_BIN) ./files/baidudrive.init $(1)/etc/init.d/baidudrive
+	$(INSTALL_BIN) ./files/baidudrive.uci-default $(1)/etc/uci-defaults/09-baidudrive
+	$(INSTALL_CONF) ./files/baidudrive.config $(1)/etc/config/baidudrive
+endef
+
+$(eval $(call BuildPackage,$(PKG_NAME)))
