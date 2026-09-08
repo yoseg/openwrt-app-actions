@@ -3,3 +3,7 @@ forkapp/forkapp
 tools/forkapp
 forkapp/forkapp.exe
 tools/forkapp.exe
+
+# Python bytecode caches
+__pycache__/
+*.py[cod]
